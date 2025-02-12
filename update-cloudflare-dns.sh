@@ -16,19 +16,19 @@ echo "==> $(date "+%Y-%m-%d %H:%M:%S")"
 ### Function for Discord error notifications
 send_discord_error() {
     local error_message="$1"
-    curl -H "Content-Type: application/json" -d '{
-        "content": null,
-        "embeds": [
+    curl -H "Content-Type: application/json" -d "{
+        \"content\": null,
+        \"embeds\": [
             {
-            "title": "❌ Cloudflare Update Error",
-            "description": "```'${error_message}'```",
-            "color": 16711680,
-            "timestamp": "'$(date -u +'%Y-%m-%dT%H:%M:%SZ')'"
+            \"title\": \"❌ Cloudflare Update Error\",
+            \"description\": \"\`\`\`${error_message}\`\`\`\",
+            \"color\": 16711680,
+            \"timestamp\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
             }
         ],
-        "username": "Cloudflare DNS Updater",
-        "attachments": []
-    }' "${discord_webhook_url}"
+        \"username\": \"Cloudflare DNS Updater\",
+        \"attachments\": []
+    }" "${discord_webhook_url}"
 }
 
 ### Validate if config-file exists
@@ -83,40 +83,28 @@ fi
 ### Valid IPv4 Regex
 REIP='^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])\.){3}(25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])$'
 
-### Get external ip from https://checkip.amazonaws.com
+### Get external ip
 if [ "${what_ip}" == "external" ]; then
-    ip=$(curl -4 -s -X GET https://checkip.amazonaws.com --max-time 10)
-    if [ -z "$ip" ]; then
-        error_msg="Error! Can't get external ip from https://checkip.amazonaws.com"
-        echo "$error_msg"
-        [[ "${notify_me_discord}" == "yes" ]] && send_discord_error "$error_msg"
-        exit 0
-    fi
-    if ! [[ "$ip" =~ $REIP ]]; then
-        error_msg="Error! IP Address returned was invalid!"
-        echo "$error_msg"
-        [[ "${notify_me_discord}" == "yes" ]] && send_discord_error "$error_msg"
-        exit 0
-    fi
-    echo "==> External IP is: $ip"
-fi
+    # Remove any existing ip variable
+    unset ip
 
-### Get Internal ip from primary interface
-if [ "${what_ip}" == "internal" ]; then
-    if which ip >/dev/null; then
-        interface=$(ip route get 1.1.1.1 | awk '/dev/ { print $5 }')
-        ip=$(ip -o -4 addr show ${interface} scope global | awk '{print $4;}' | cut -d/ -f 1)
-    else
-        interface=$(route get 1.1.1.1 | awk '/interface:/ { print $2 }')
-        ip=$(ifconfig ${interface} | grep 'inet ' | awk '{print $2}')
-    fi
+    # Try multiple services until we get a valid IP
+    for service in "https://checkip.amazonaws.com" "https://api.ipify.org" "https://ifconfig.me"; do
+        temp_ip=$(curl -4 -s --max-time 10 "$service" | tr -d '[:space:]')
+        if [[ -n "$temp_ip" && "$temp_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            ip="$temp_ip"
+            break
+        fi
+    done
+
     if [ -z "$ip" ]; then
-        error_msg="Error! Can't read ip from ${interface}"
+        error_msg="Error! Could not obtain a valid external IP from any source"
         echo "$error_msg"
         [[ "${notify_me_discord}" == "yes" ]] && send_discord_error "$error_msg"
         exit 0
     fi
-    echo "==> Internal ${interface} IP is: $ip"
+
+    echo "==> External IP is: $ip"
 fi
 
 ### Build coma separated array from dns_record parameter to update multiple A records
@@ -194,7 +182,7 @@ for record in "${dns_records[@]}"; do
             "embeds": [
                 {
                 "title": "✅ Cloudflare DNS Update Successful",
-                "description": "Domain: `'${record}'`\nNew IP: `'${ip}'`\nTTL: `'${ttl}'`\nProxied: `'${proxied}'`",
+                "description": "Domain: `'${record}'`\nNew IP: ||`'${ip}'`||\nTTL: `'${ttl}'`\nProxied: `'${proxied}'`",
                 "color": 65280,
                 "timestamp": "'$(date -u +'%Y-%m-%dT%H:%M:%SZ')'"
                 }
