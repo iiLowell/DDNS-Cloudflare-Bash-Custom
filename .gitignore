@@ -1,6 +1,6 @@
-# Dev files
+# Local Dev config
 
-test.conf
+update-cloudflare-dns-local.conf
 
 # General
 .DS_Store
