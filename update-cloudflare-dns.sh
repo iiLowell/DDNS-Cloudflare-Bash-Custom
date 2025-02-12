@@ -160,19 +160,30 @@ for record in "${dns_records[@]}"; do
   echo "==> Success!"
   echo "==> $record DNS Record updated to: $ip, ttl: $ttl, proxied: $proxied"
 
-  ### Telegram notification
-  if [ ${notify_me_telegram} == "no" ]; then
+  ### Discord notification
+  if [ ${notify_me_discord} == "no" ]; then
     exit 0
   fi
 
-  if [ ${notify_me_telegram} == "yes" ]; then
-    telegram_notification=$(
-      curl -s -X GET "https://api.telegram.org/bot${telegram_bot_API_Token}/sendMessage?chat_id=${telegram_chat_id}" --data-urlencode "text=${record} DNS record updated to: ${ip}"
+  if [ ${notify_me_discord} == "yes" ]; then
+    discord_notification=$(
+        curl -H "Content-Type: application/json" -d '{
+        "content": null,
+        "embeds": [
+            {
+            "title": "Your Cloudflare configuration was changed!",
+            "description": "Everything went well, if you have further questions, please ask your server administrator.",
+            "color": 16777215,
+            "timestamp": "'$(date -u +'%Y-%m-%dT%H:%M:%SZ')'"
+            }
+        ],
+        "username": "RPI 5 Server Cloudflare updater",
+        "attachments": []
+        }' "${discord_webhook_url}"
     )
-    if [[ ${telegram_notification=} == *"\"ok\":false"* ]]; then
-      echo ${telegram_notification=}
-      echo "Error! Telegram notification failed"
-      exit 0
-    fi
+    if [ $? -ne 0 ]; then
+        echo "Error! Discord notification failed due to curl error: ${discord_notification}"
+        exit 1
+      fi
   fi
 done
