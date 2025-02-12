@@ -3,15 +3,15 @@
 ###  Create .update-cloudflare-dns.log file of the last run for debug
 parent_path="$(dirname "${BASH_SOURCE[0]}")"
 FILE=${parent_path}/update-cloudflare-dns.log
-#if ! [ -x "$FILE" ]; then
-#  touch "$FILE"
-#fi
+if ! [ -x "$FILE" ]; then
+  touch "$FILE"
+fi
 
-#LOG_FILE=${parent_path}'/update-cloudflare-dns.log'
+LOG_FILE=${parent_path}'/update-cloudflare-dns.log'
 
 ### Write last run of STDOUT & STDERR as log file and prints to screen
-#exec > >(tee $LOG_FILE) 2>&1
-#echo "==> $(date "+%Y-%m-%d %H:%M:%S")"
+exec > >(tee $LOG_FILE) 2>&1
+echo "==> $(date "+%Y-%m-%d %H:%M:%S")"
 
 ### Validate if config-file exists
 
