@@ -1,6 +1,7 @@
 # Local Dev config
 
 update-cloudflare-dns-local.conf
+update-cloudflare-dns-local.log
 
 # General
 .DS_Store
