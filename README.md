@@ -115,7 +115,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project was originaly released by [fire1ce](https://github.com/fire1ce/DDNS-Cloudflare-Bash) view [their License](https://github.com/fire1ce/DDNS-Cloudflare-Bash?tab=readme-ov-file#license).
+This project was originaly [released by fire1ce](https://github.com/fire1ce/DDNS-Cloudflare-Bash) view [their License](https://github.com/fire1ce/DDNS-Cloudflare-Bash?tab=readme-ov-file#license).
 
 ## Acknowledgments
 
@@ -123,4 +123,4 @@ This project was originaly released by [fire1ce](https://github.com/fire1ce/DDNS
 - Cloudflare for their API
 - External IP services: checkip.amazonaws.com, api.ipify.org, and ifconfig.me
 
-This project is a modified version of the original [DDNS-Cloudflare-Bash](https://github.com/fire1ce/DDNS-Cloudflare-Bash) by fire1ce, with added features such as Discord notifications and multiple IP service failover support.
+This project is a modified version of the original [DDNS-Cloudflare-Bash](https://github.com/fire1ce/DDNS-Cloudflare-Bash) by [fire1ce](https://github.com/fire1ce), with added features such as Discord notifications and multiple IP service failover support.
